@@ -22,10 +22,18 @@ describe("captor/quantlib", () => {
     });
 
     test("Calendar weekday", async () => {
-        const { Date, Weekday } = QuantLib;
-        var settlementDate = Date.fromISOString("2008-09-18");
+        const { Date: QlDate, Weekday } = QuantLib;
+        var settlementDate = QlDate.fromISOString("2008-09-18");
         expect(settlementDate.weekday().value).toBe(Weekday.Thursday.value);
         settlementDate.delete();
+    });
+
+    test("Todays date", async () => {
+        const { Date: QlDate } = QuantLib;
+        let today = QlDate.todaysDate();
+        let jsToday = new Date();
+        expect(today.toISOString()).toEqual(jsToday.toISOString().substring(0, 10));
+        today.delete();
     });
 
     test("UK Calendar", async () => {
@@ -66,6 +74,17 @@ describe("captor/quantlib", () => {
         expect(myDate.month().value).toBe(8);
         expect(myDate.year()).toBe(2009);
         expect(myDate.serialNumber()).toBe(40037);
+    });
+
+    test("Valuation date", async () => {
+        const { Date, Month, setValuationDate, getValuationDate } = QuantLib;
+        let myDate = new Date(12, Month.Aug, 2009);
+        setValuationDate(myDate);
+        let valDate = getValuationDate();
+        expect(myDate).toEqual(valDate);
+        expect(myDate.toISOString()).toEqual(valDate.toISOString());
+        valDate.delete();
+        myDate.delete();
     });
 
     test("DayCounters", async () => {
